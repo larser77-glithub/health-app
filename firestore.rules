@@ -1,0 +1,51 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // User Profile Rules
+    match /users/{userId} {
+      function isValidUser(data) {
+        return data.userId == request.auth.uid &&
+               data.email is string &&
+               data.email.size() <= 256;
+      }
+
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data) &&
+                      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'condition', 'weakMuscles', 'updatedAt']);
+
+      // Workouts Subcollection
+      match /workouts/{workoutId} {
+        function isValidWorkout(data) {
+          return data.userId == request.auth.uid &&
+                 data.category in ['rehabilitation', 'bodyweight'] &&
+                 data.exerciseName is string && data.exerciseName.size() <= 100 &&
+                 data.count is number &&
+                 data.timestamp == request.time;
+        }
+
+        allow list: if isOwner(userId);
+        allow get: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidWorkout(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+    }
+  }
+}

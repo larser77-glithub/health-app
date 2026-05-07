@@ -1,0 +1,44 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User profile containing physical conditions and preferences.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "condition": { "type": "string", "description": "Known medical condition or disease" },
+        "weakMuscles": { "type": "array", "items": { "type": "string" }, "description": "Weak muscle groups" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "email"]
+    },
+    "Workout": {
+      "title": "Workout Record",
+      "description": "Record of a completed workout session.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "category": { "type": "string", "enum": ["rehabilitation", "bodyweight"] },
+        "exerciseName": { "type": "string" },
+        "count": { "type": "number" },
+        "duration": { "type": "number", "description": "Duration in seconds" },
+        "feedback": { "type": "string" },
+        "condition": { "type": "string", "description": "Condition context for rehab workouts" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "category", "exerciseName", "timestamp"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "User profile documents"
+    },
+    "users/{userId}/workouts/{workoutId}": {
+      "schema": "Workout",
+      "description": "Historical workout records for each user"
+    }
+  }
+}

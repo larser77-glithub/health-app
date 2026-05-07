@@ -1,0 +1,8 @@
+{
+  "name": "Remix: Remix: Physical AI Motion Coach",
+  "description": "맞춤형 재활 및 맨몸운동 분석 플랫폼. 실시간 AI 모션 피드백과 개인화된 루틴 추천을 제공합니다.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": []
+}
